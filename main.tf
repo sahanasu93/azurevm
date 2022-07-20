@@ -1,10 +1,3 @@
-# Configure the Microsoft Azure Provider example
-provider "azurerm" {
-    # The "feature" block is required for AzureRM provider 2.x. 
-    # If you're using version 1.x, the "features" block is not allowed.
-    version = "~>2.0"
-    features {}
-}
 
 # Create a resource group if it doesn't exist
 resource "azurerm_resource_group" "myterraformgroup" {
@@ -122,33 +115,30 @@ resource "azurerm_storage_account" "mystorageaccount" {
 
 
 # Create virtual machine
-resource "azurerm_linux_virtual_machine" "myterraformvm" {
+resource "azurerm_windows_virtual_machine" "myterraformvm" {
     name                  = "myVM"
     location              = "West US 3"
     resource_group_name   = azurerm_resource_group.myterraformgroup.name
     network_interface_ids = [azurerm_network_interface.myterraformnic.id]
-    size                  = "Standard_DS1_v2"
+    size                  = "Standard_B1s"
 
     os_disk {
-        name              = "myOsDisk"
+        name              = "myosdisk"
         caching           = "ReadWrite"
-        storage_account_type = "Premium_LRS"
+        storage_account_type = "Standard_LRS"
     }
 
     source_image_reference {
-        publisher = "Canonical"
-        offer     = "UbuntuServer"
-        sku       = "20.04-LTS"
+        publisher = "MicrosoftWindowsServer"
+        offer     = "WindowsServer"
+        sku       = "2019-Datacenter"
         version   = "latest"
     }
 
     computer_name  = "myvm"
     admin_username = "azureuser"
     admin_password = "Password1234!"
-    disable_password_authentication = false
-        
-
-
+    
     boot_diagnostics {
         storage_account_uri = azurerm_storage_account.mystorageaccount.primary_blob_endpoint
     }
